@@ -33,6 +33,10 @@ class Levenshtein:
             of single-character edits
             (insertions, deletions or substitutions)
             required to change one word into the other.
+    
+    Attributes:
+        cog (:class:`~discord.ext.commands.Cog`):
+            The cog that was added at initialization.
 
     Note:
         When CommandNotFound exception is raised
@@ -49,8 +53,15 @@ class Levenshtein:
         self._command_names: Set[str] = set()
         self._listup_commands(self.bot)
         self._max_length = max_length
-        cog = InnerLevenshtein(self.bot, self._max_length, list(self._command_names))
-        self.bot.add_cog(cog)
+        self.cog = InnerLevenshtein(self.bot, self._max_length, list(self._command_names))
+        self.bot.add_cog(self.cog)
+    
+    def __del__(self):
+        self.bot.remove_cog(self.cog.qualified_name)
+
+    def reload(self):
+        """Reloads bot's commands."""
+        self.cog.command_names = self._listup_commands(self.bot)
 
     def _listup_commands(self, group, prefix=None):
         if prefix is None:
