@@ -24,3 +24,6 @@ class InnerLevenshtein(commands.Cog):
                 suggested_commands.append((dist, command))
 
         return [command[1] for command in sorted(suggested_commands)]
+    
+    def cog_unload(self):
+        self.bot.remove_listener(self.on_command_error)
